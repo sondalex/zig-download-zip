@@ -1,0 +1,32 @@
+name: CI Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install zig 
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0-dev.2984+cb7d2b056
+      - name: Cleanup cache folders
+        continue-on-error: true
+        run: |
+          set -x  # enable shell tracing (shows every command)
+          echo "ZIG_GLOBAL_CACHE_DIR=${ZIG_GLOBAL_CACHE_DIR}"
+          echo "ZIG_LOCAL_CACHE_DIR=${ZIG_LOCAL_CACHE_DIR}"
+          rm -rfv "$ZIG_GLOBAL_CACHE_DIR" || true
+          rm -rfv "$ZIG_LOCAL_CACHE_DIR" || true
+          set +x
+      - name: Unit tests
+        run: zig build test --summary all -j1
+      - name: Build project 
+        run: zig build --summary all -j1 --color off --verbose
+      

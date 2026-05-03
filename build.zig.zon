@@ -1,0 +1,18 @@
+.{
+    .name = .zig_download_zip,
+    .version = "0.0.0",
+    .fingerprint = 0x2716f135df6ef280,
+    .minimum_zig_version = "0.16.0-dev.3073+28ae5d415",
+    .dependencies = .{
+        .temp = .{
+            .url = "https://github.com/sondalex/temp.zig/archive/refs/heads/support_v0_16.tar.gz",
+            .hash = "temp-0.3.0-Ogl1FYyHAABgf9Y4zQKLRu_TicogkE22SjMs2lcZVPUT",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src/root.zig",
+        "src/downloader.zig",
+    },
+}
