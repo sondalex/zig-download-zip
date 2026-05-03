@@ -6,6 +6,8 @@ const Dir = Io.Dir;
 const File = Io.File;
 const zip = std.zip;
 
+const log = std.log.scoped(.download_zip);
+
 pub const CreateDirOptions = struct {
     fail: bool = false,
     recursive: bool = false,
@@ -54,6 +56,7 @@ pub fn extract_override(
 
         if (dest.statFile(io, filename, .{})) |stat| {
             if (stat.kind == .file) {
+                log.debug("Overwriting existing file: {s}", .{filename});
                 try dest.deleteFile(io, filename);
             }
         } else |err| switch (err) {
@@ -99,6 +102,7 @@ pub const DownloadZip = struct {
     }
 
     pub fn downloadAndExtract(self: *Self, url: []const u8, dest_dir: []const u8) !void {
+        log.info("Downloading {s} → {s}", .{ url, dest_dir });
         try createDir(self.io, dest_dir, .{
             .fail = false,
             .recursive = true,
@@ -112,8 +116,10 @@ pub const DownloadZip = struct {
         var buffer: [Dir.max_path_bytes]u8 = undefined;
         const n = try temp_file.parent_dir.realPathFile(self.io, temp_file.basename, &buffer);
         const temp_path: []const u8 = buffer[0..n];
+        log.debug("Downloading to temp file: {s}", .{temp_path});
         try self.downloadFile(url, temp_path);
         try self.unzip(temp_path, dest_dir);
+        log.info("Extracted to {s}", .{dest_dir});
     }
     pub fn http_get(
         self: Self,
@@ -136,7 +142,7 @@ pub const DownloadZip = struct {
         });
 
         if (!(result.status == .ok)) {
-            std.debug.print("HTTP error: {}\n", .{result.status});
+            log.err("HTTP request failed with status: {}", .{result.status});
             return error.HttpRequestFailed;
         }
 
