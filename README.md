@@ -31,16 +31,13 @@ pub fn build(b: *std.Build) void {
     const download_zip_dep = b.dependency("download_zip", .{});
     const dz = download_zip_dep.module("zig_download_zip");
 
-    const download_step = dz.DownloadZip.addDownloadStep(
+    _ = dz.DownloadZip.addDownloadStep(
         b,
         "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/DejaVuSansMono.zip",
         "fonts/DejaVuSansMono",
-        "download-font",
+        "dz", // dz for download zip
         "Download DejaVuSansMono Nerd Font",
     );
-
-    // Make your executable depend on the download
-    my_exe.step.dependOn(download_step);
 }
 ```
 
